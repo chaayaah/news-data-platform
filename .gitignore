@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+
+.env
+.venv/
+
+.vscode/
+.idea/
+
+logs/
+
+data/bronze/
+data/silver/
+data/gold/
+
+*.db
