@@ -9,3 +9,11 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );
+
+CREATE TABLE IF NOT EXISTS article_summary (
+
+    country VARCHAR(100),
+
+    article_count INTEGER
+
+);
