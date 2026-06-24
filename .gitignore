@@ -12,5 +12,10 @@ logs/
 data/bronze/
 data/silver/
 data/gold/
+data/rejects/
+
+# Spark artifacts
+*.crc
+_SUCCESS
 
 *.db

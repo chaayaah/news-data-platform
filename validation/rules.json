@@ -1,0 +1,7 @@
+{
+    "required_fields": [
+        "publication_name",
+        "headline",
+        "author"
+    ]
+}

@@ -1,48 +1,105 @@
 from pyspark.sql import SparkSession
 import json
 import xml.etree.ElementTree as ET
+import glob
+import os
 
 # Create Spark Session
 spark = SparkSession.builder \
     .appName("NewsDataPlatform") \
     .getOrCreate()
 
-# Read XML
-tree = ET.parse("/app/sample_data/article.xml")
-root = tree.getroot()
-
-
 # Read Mapping
 with open("/app/mappings/article_mapping.json", "r") as f:
     mapping = json.load(f)
 
-# Transform XML -> Dictionary
-record = {}
+# Read Validation Rules
+with open("/app/validation/rules.json", "r") as f:
+    rules = json.load(f)
 
-for target_field, source_field in mapping.items():
+required_fields = rules["required_fields"]
 
-    element = root.find(source_field)
+valid_records = []
+invalid_records = []
 
-    if element is not None:
-        record[target_field] = element.text
+# Loop through XML files
+for xml_file in glob.glob("/app/sample_data/*.xml"):
+
+    print(f"Processing: {os.path.basename(xml_file)}")
+
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+
+    record = {}
+
+    # Apply mapping
+    for target_field, source_field in mapping.items():
+
+        element = root.find(source_field)
+
+        if element is not None:
+            record[target_field] = element.text
+        else:
+            record[target_field] = None
+
+    # Validation
+    errors = []
+
+    for field in required_fields:
+
+        if not record.get(field):
+            errors.append(f"{field} is missing")
+
+    if errors:
+
+        invalid_records.append({
+            "file": os.path.basename(xml_file),
+            "errors": ", ".join(errors)
+        })
+
+        print(f"FAILED: {errors}")
+
     else:
-        record[target_field] = None
 
-# Debug Output
-print("\n=== RECORD ===")
-print(record)
+        valid_records.append(record)
 
-# Create DataFrame
-df = spark.createDataFrame([record])
+        print("PASSED")
 
-print("\n=== ARTICLE DATA ===")
-df.show(truncate=False)
+# Write Bronze
+if valid_records:
 
-# Write to Bronze Layer
-df.write.mode("overwrite").parquet(
-    "/app/data/bronze/article"
-)
+    df = spark.createDataFrame(valid_records)
 
-print("Saved to Bronze Layer")
+    print("\n=== VALID RECORDS ===")
+    df.show(truncate=False)
+
+    df.write.mode("overwrite").parquet(
+        "/app/data/bronze/article"
+    )
+
+# Validation Summary
+print("\n=== SUMMARY ===")
+print(f"Valid Records: {len(valid_records)}")
+print(f"Invalid Records: {len(invalid_records)}")
+
+for invalid in invalid_records:
+    print(invalid)
+
+if invalid_records:
+
+    with open(
+        "/app/data/rejects/validation_report.json",
+        "w"
+    ) as f:
+
+        json.dump(
+            invalid_records,
+            f,
+            indent=4
+        )
+
+    print(
+        "Validation report saved"
+    )
 
 spark.stop()
