@@ -11,6 +11,8 @@ RUN mkdir -p /opt/jars
 RUN wget -O /opt/jars/postgresql.jar \
     https://jdbc.postgresql.org/download/postgresql-42.7.7.jar
 
-RUN pip install pyspark
+RUN pip install \
+    pyspark \
+    psycopg2-binary
 
 CMD ["tail", "-f", "/dev/null"]

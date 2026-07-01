@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS pipeline_runs (
+CREATE TABLE pipeline_runs (
 
     id SERIAL PRIMARY KEY,
 
@@ -6,14 +6,14 @@ CREATE TABLE IF NOT EXISTS pipeline_runs (
 
     status VARCHAR(50),
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    start_time TIMESTAMP,
 
-);
+    end_time TIMESTAMP,
 
-CREATE TABLE IF NOT EXISTS article_summary (
+    duration_seconds INTEGER,
 
-    country VARCHAR(100),
+    records_processed INTEGER,
 
-    article_count INTEGER
+    error_message TEXT
 
 );
