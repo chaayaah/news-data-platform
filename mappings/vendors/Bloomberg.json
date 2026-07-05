@@ -1,6 +1,11 @@
 {
-    "headline": "headline",
-    "author": "author",
-    "country": "country",
-    "publication_name": "publication_name"
+    "record_tag": "entry",
+
+    "article_id": "articleId",
+    "publication_name": "provider",
+    "section": "category",
+    "published_date": "publishDate",
+    "headline": "title",
+    "author": "byline",
+    "content": "content"
 }

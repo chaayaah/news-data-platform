@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package build="2026-07-05">
+
+    <document>
+
+        <id>1001</id>
+
+        <source>Reuters</source>
+
+        <mainsection>Business</mainsection>
+
+        <pubDate>2026-07-05 08:30:00</pubDate>
+
+        <headline>Market rises on trade optimism</headline>
+
+        <authors>John Smith</authors>
+
+        <longtext>
+            Stocks rose after positive trade negotiations.
+        </longtext>
+
+    </document>
+
+    <document>
+
+        <id>1002</id>
+
+        <source>Reuters</source>
+
+        <mainsection>Technology</mainsection>
+
+        <pubDate>2026-07-05 09:15:00</pubDate>
+
+        <headline>AI investment reaches record high</headline>
+
+        <authors>Jane Doe</authors>
+
+        <longtext>
+            Artificial intelligence investment reached a new record this quarter.
+        </longtext>
+
+    </document>
+
+</package>

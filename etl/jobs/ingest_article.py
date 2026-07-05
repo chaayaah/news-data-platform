@@ -1,20 +1,30 @@
 from pyspark.sql import SparkSession
+from etl.services.mapping_loader import MappingLoader
+
 import json
 import xml.etree.ElementTree as ET
 import glob
 import os
 
-# Create Spark Session
+# -----------------------------
+# Spark
+# -----------------------------
+
 spark = SparkSession.builder \
     .appName("NewsDataPlatform") \
     .getOrCreate()
 
-# Load Vendor Registry
-with open("/app/mappings/vendor_registry.json", "r") as f:
-    vendor_registry = json.load(f)
+# -----------------------------
+# Services
+# -----------------------------
 
-# Load Validation Rules
-with open("/app/validation/rules.json", "r") as f:
+loader = MappingLoader()
+
+# -----------------------------
+# Validation Rules
+# -----------------------------
+
+with open("/app/validation/rules.json") as f:
     rules = json.load(f)
 
 required_fields = rules["required_fields"]
@@ -22,99 +32,154 @@ required_fields = rules["required_fields"]
 valid_records = []
 invalid_records = []
 
-# Loop through XML files
-for xml_file in glob.glob("/app/sample_data/*.xml"):
+# -----------------------------
+# Process every vendor XML
+# -----------------------------
 
-    print(f"Processing: {os.path.basename(xml_file)}")
+for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
 
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
+    print("=" * 60)
+    print(f"Processing: {xml_file}")
 
-    publication = root.find("publication_name").text
-
-
-    if publication not in vendor_registry:
-
-        print(
-            f"Unknown vendor: {publication}"
+    # Vendor comes from folder name
+    # sample_data/Reuters/raw/file.xml
+    vendor = os.path.basename(
+        os.path.dirname(
+            os.path.dirname(xml_file)
         )
+    )
+
+    print(f"Vendor: {vendor}")
+
+    try:
+
+        mapping = loader.load_mapping(vendor)
+
+    except ValueError as e:
+
+        print(e)
 
         invalid_records.append({
             "file": os.path.basename(xml_file),
-            "errors": f"Unknown vendor: {publication}"
+            "errors": str(e)
         })
 
         continue
 
-    mapping_filename = vendor_registry[publication]
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
 
+    record_tag = mapping["record_tag"]
 
+    records = root.findall(record_tag)
 
-    print(
-        f"{os.path.basename(xml_file)} -> {mapping_filename}"
-    )
+    print(f"Records Found: {len(records)}")
 
-    mapping_path = (
-        f"/app/mappings/vendors/{mapping_filename}"
-    )
+    # -----------------------------
+    # Process every document
+    # -----------------------------
 
-    with open(mapping_path, "r") as f:
-        mapping = json.load(f)
+    for record in records:
 
-    record = {}
+        normalized = {}
 
-    # Apply Mapping
-    for target_field, source_field in mapping.items():
+        for target_field, source_field in mapping.items():
 
-        element = root.find(source_field)
+            if target_field == "record_tag":
+                continue
 
-        if element is not None:
-            record[target_field] = element.text
+            element = record.find(source_field)
+
+            if element is not None:
+
+                normalized[target_field] = (
+                    element.text.strip()
+                    if element.text
+                    else ""
+                )
+
+            else:
+
+                normalized[target_field] = None
+
+        # -------------------------
+        # Validation
+        # -------------------------
+
+        errors = []
+
+        for field in required_fields:
+
+            if not normalized.get(field):
+
+                errors.append(
+                    f"{field} is missing"
+                )
+
+        if errors:
+
+            invalid_records.append({
+                "file": os.path.basename(xml_file),
+                "errors": ", ".join(errors)
+            })
+
+            print(
+                f"FAILED: {errors}"
+            )
+
         else:
-            record[target_field] = None
 
-    # Validation
-    errors = []
+            valid_records.append(
+                normalized
+            )
 
-    for field in required_fields:
+            print(
+                f"PASSED - {normalized['headline']}"
+            )
 
-        if not record.get(field):
-            errors.append(f"{field} is missing")
-
-    if errors:
-
-        invalid_records.append({
-            "file": os.path.basename(xml_file),
-            "errors": ", ".join(errors)
-        })
-
-        print(f"FAILED: {errors}")
-
-    else:
-
-        valid_records.append(record)
-
-        print("PASSED")
-
+# -----------------------------
 # Write Bronze
+# -----------------------------
+
 if valid_records:
 
-    df = spark.createDataFrame(valid_records)
+    df = spark.createDataFrame(
+        valid_records
+    )
 
-    print("\n=== VALID RECORDS ===")
+    print("\n=== BRONZE DATA ===")
+
     df.show(truncate=False)
 
     df.write.mode("overwrite").parquet(
         "/app/data/bronze/article"
     )
 
-# Validation Summary
-print("\n=== SUMMARY ===")
-print(f"Valid Records: {len(valid_records)}")
-print(f"Invalid Records: {len(invalid_records)}")
+# -----------------------------
+# Summary
+# -----------------------------
+
+print("\n" + "=" * 60)
+
+print("SUMMARY")
+
+print("=" * 60)
+
+print(
+    f"Valid Records: {len(valid_records)}"
+)
+
+print(
+    f"Invalid Records: {len(invalid_records)}"
+)
 
 for invalid in invalid_records:
+
     print(invalid)
+
+# -----------------------------
+# Reject Report
+# -----------------------------
 
 if invalid_records:
 
@@ -128,7 +193,5 @@ if invalid_records:
             f,
             indent=4
         )
-
-    print("Validation report saved")
 
 spark.stop()

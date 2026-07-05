@@ -1,6 +1,11 @@
 {
+    "record_tag": "document",
+
+    "article_id": "id",
+    "publication_name": "source",
+    "section": "section",
+    "published_date": "datePublished",
     "headline": "title",
     "author": "writer",
-    "country": "location",
-    "publication_name": "publication_name"
+    "content": "body"
 }

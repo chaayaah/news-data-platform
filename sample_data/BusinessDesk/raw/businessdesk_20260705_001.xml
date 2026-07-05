@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package build="2026-07-05">
+
+    <document>
+
+        <id>2001</id>
+
+        <source>BusinessDesk</source>
+
+        <section>Business</section>
+
+        <datePublished>2026-07-05 10:15:00</datePublished>
+
+        <title>Business confidence improves</title>
+
+        <writer>Michael Tan</writer>
+
+        <body>
+            Business confidence continues to improve this quarter.
+        </body>
+
+    </document>
+
+</package>

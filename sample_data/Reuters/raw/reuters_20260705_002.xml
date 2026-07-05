@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package build="2026-07-05">
+
+    <document>
+
+        <id>1003</id>
+
+        <source>Reuters</source>
+
+        <mainsection>Economy</mainsection>
+
+        <pubDate>2026-07-05 11:00:00</pubDate>
+
+        <headline>Inflation slows in June</headline>
+
+        <authors>John Smith</authors>
+
+        <longtext>
+            Inflation slowed for the third consecutive month.
+        </longtext>
+
+    </document>
+
+</package>

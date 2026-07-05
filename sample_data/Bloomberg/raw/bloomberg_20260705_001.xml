@@ -1,0 +1,23 @@
+<package>
+
+    <entry>
+
+        <articleId>2001</articleId>
+
+        <provider>Bloomberg</provider>
+
+        <category>Markets</category>
+
+        <publishDate>2026-07-05 09:30:00</publishDate>
+
+        <title>Stocks advance after jobs report</title>
+
+        <byline>Sarah Johnson</byline>
+
+        <content>
+            Global stocks advanced after stronger employment data...
+        </content>
+
+    </entry>
+
+</package>
