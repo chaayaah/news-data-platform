@@ -9,11 +9,11 @@ spark = SparkSession.builder \
     .appName("NewsDataPlatform") \
     .getOrCreate()
 
-# Read Mapping
-with open("/app/mappings/article_mapping.json", "r") as f:
-    mapping = json.load(f)
+# Load Vendor Registry
+with open("/app/mappings/vendor_registry.json", "r") as f:
+    vendor_registry = json.load(f)
 
-# Read Validation Rules
+# Load Validation Rules
 with open("/app/validation/rules.json", "r") as f:
     rules = json.load(f)
 
@@ -30,9 +30,40 @@ for xml_file in glob.glob("/app/sample_data/*.xml"):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
+    publication = root.find("publication_name").text
+
+
+    if publication not in vendor_registry:
+
+        print(
+            f"Unknown vendor: {publication}"
+        )
+
+        invalid_records.append({
+            "file": os.path.basename(xml_file),
+            "errors": f"Unknown vendor: {publication}"
+        })
+
+        continue
+
+    mapping_filename = vendor_registry[publication]
+
+
+
+    print(
+        f"{os.path.basename(xml_file)} -> {mapping_filename}"
+    )
+
+    mapping_path = (
+        f"/app/mappings/vendors/{mapping_filename}"
+    )
+
+    with open(mapping_path, "r") as f:
+        mapping = json.load(f)
+
     record = {}
 
-    # Apply mapping
+    # Apply Mapping
     for target_field, source_field in mapping.items():
 
         element = root.find(source_field)
@@ -98,8 +129,6 @@ if invalid_records:
             indent=4
         )
 
-    print(
-        "Validation report saved"
-    )
+    print("Validation report saved")
 
 spark.stop()

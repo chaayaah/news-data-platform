@@ -1,6 +1,6 @@
 <article>
-    <pubname>Bloomberg</pubname>
-    <headline>Oil prices decline</headline>
-    <author>Jane Doe</author>
-    <country>UK</country>
+    <title>Business News</title>
+    <writer>John</writer>
+    <location>USA</location>
+    <publication_name>BusinessDesk</publication_name>
 </article>

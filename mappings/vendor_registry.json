@@ -1,0 +1,6 @@
+{
+    "Reuters": "Reuters.json",
+    "Bloomberg": "Bloomberg.json",
+    "CNN": "CNN.json",
+    "BusinessDesk": "BusinessDesk.json"
+}
