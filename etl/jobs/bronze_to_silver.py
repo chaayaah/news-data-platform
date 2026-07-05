@@ -1,14 +1,13 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import upper, trim
+from orchestration.config import BRONZE_PATH
 
 spark = SparkSession.builder \
     .appName("BronzeToSilver") \
     .getOrCreate()
 
 # Read Bronze
-bronze_df = spark.read.parquet(
-    "/app/data/bronze/article"
-)
+bronze_df = spark.read.parquet(BRONZE_PATH)
 
 print("\n=== BRONZE DATA ===")
 bronze_df.show(truncate=False)

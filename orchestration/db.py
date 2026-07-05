@@ -1,15 +1,13 @@
 import psycopg2
-
+import orchestration.config as config
 
 def get_connection():
-
     return psycopg2.connect(
-        host="news-postgres",
-        database="newsdb",
-        user="postgres",
-        password="postgres"
-    )
-
+        host=config.POSTGRES_HOST,
+        database=config.POSTGRES_DB,
+        user=config.POSTGRES_USER,
+        password=config.POSTGRES_PASSWORD
+)
 
 def start_pipeline(pipeline_name):
 

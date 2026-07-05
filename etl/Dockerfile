@@ -13,6 +13,7 @@ RUN wget -O /opt/jars/postgresql.jar \
 
 RUN pip install \
     pyspark \
-    psycopg2-binary
-
+    psycopg2-binary \
+    python-dotenv
+    
 CMD ["tail", "-f", "/dev/null"]

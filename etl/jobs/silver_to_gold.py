@@ -1,13 +1,13 @@
 from pyspark.sql import SparkSession
+from orchestration.config import SILVER_PATH
+
 
 spark = SparkSession.builder \
     .appName("SilverToGold") \
     .getOrCreate()
 
 # Read Silver
-silver_df = spark.read.parquet(
-    "/app/data/silver/article"
-)
+silver_df = spark.read.parquet(SILVER_PATH)
 
 print("\n=== SILVER DATA ===")
 silver_df.show(truncate=False)

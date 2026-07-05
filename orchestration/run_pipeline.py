@@ -7,13 +7,13 @@ from orchestration.db import (
     finish_pipeline,
     fail_pipeline
 )
-
+from orchestration.config import PIPELINE_NAME
 
 steps = [
-    "pyspark/jobs/ingest_article.py",
-    "pyspark/jobs/bronze_to_silver.py",
-    "pyspark/jobs/silver_to_gold.py",
-    "pyspark/jobs/gold_to_postgres.py"
+    "etl.jobs.ingest_article",
+    "etl.jobs.bronze_to_silver",
+    "etl.jobs.silver_to_gold",
+    "etl.jobs.gold_to_postgres"
 ]
 
 
@@ -28,7 +28,9 @@ log("=" * 60)
 
 start = time.time()
 
-pipeline_id = start_pipeline("News Data Pipeline")
+pipeline_id = start_pipeline(
+    PIPELINE_NAME
+)
 
 log(f"Pipeline ID: {pipeline_id}")
 
@@ -37,7 +39,7 @@ for step in steps:
     log(f"\nRunning: {step}")
 
     result = subprocess.run(
-        ["python", step]
+        ["python", "-m", step]
     )
 
     if result.returncode != 0:

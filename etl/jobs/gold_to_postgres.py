@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
+from orchestration.config import GOLD_PATH
 
 spark = SparkSession.builder \
     .appName("GoldToPostgres") \
@@ -10,10 +11,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # Read Gold Layer
-gold_df = spark.read.parquet(
-    "/app/data/gold/article_summary"
-)
-
+gold_df = spark.read.parquet(GOLD_PATH)
 print("\n=== GOLD DATA ===")
 gold_df.show(truncate=False)
 
