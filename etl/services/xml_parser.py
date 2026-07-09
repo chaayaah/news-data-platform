@@ -10,7 +10,12 @@ class XMLParser:
 
         record_tag = mapping["record_tag"]
 
+        print(f"Root Tag   : {root.tag}")
+        print(f"Record Tag : {record_tag}")
+
         documents = root.findall(record_tag)
+
+        print(f"Found {len(documents)} {record_tag}(s)")
 
         for document in documents:
 
@@ -23,20 +28,30 @@ class XMLParser:
 
                 element = document.find(source_field)
 
-                if element is not None:
+                if element is None:
 
-                    normalized[target_field] = (
+                    normalized[target_field] = None
+                    continue
+
+                # Handle nested XML (e.g. <longtext><p>...</p></longtext>)
+                if list(element):
+
+                    text = " ".join(
+                        t.strip()
+                        for t in element.itertext()
+                        if t.strip()
+                    )
+
+                else:
+
+                    text = (
                         element.text.strip()
                         if element.text
                         else ""
                     )
 
-                else:
+                normalized[target_field] = text
 
-                    normalized[target_field] = None
-
-            records.append(
-                normalized
-            )
+            records.append(normalized)
 
         return records

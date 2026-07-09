@@ -1,11 +1,10 @@
 {
-    "record_tag": "entry",
-
-    "article_id": "articleId",
-    "publication_name": "provider",
-    "section": "category",
-    "published_date": "publishDate",
-    "headline": "title",
-    "author": "byline",
-    "content": "content"
+    "record_tag": "document",
+    "article_id": "id",
+    "publication_name": "publication_name",
+    "section": "mainsection",
+    "published_date": "pubDate",
+    "headline": "headline",
+    "author": "authors",
+    "content": "longtext"
 }

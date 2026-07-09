@@ -4,21 +4,49 @@
 
     <document>
 
-        <id>2001</id>
+        <id>3001</id>
 
-        <source>BusinessDesk</source>
+        <publication_name>BusinessDesk</publication_name>
 
-        <section>Business</section>
+        <source>www.businessdesk.co.nz</source>
 
-        <datePublished>2026-07-05 10:15:00</datePublished>
+        <language>en</language>
 
-        <title>Business confidence improves</title>
+        <mainsection>Business</mainsection>
 
-        <writer>Michael Tan</writer>
+        <subcategory>Economic News</subcategory>
 
-        <body>
-            Business confidence continues to improve this quarter.
-        </body>
+        <pubDate>2026-07-05 10:15:00</pubDate>
+
+        <headline>Business confidence improves in second quarter</headline>
+
+        <authors>Michael Tan</authors>
+
+        <company>BusinessDesk</company>
+
+        <country>New Zealand</country>
+
+        <keywords>
+            <keyword>Business</keyword>
+            <keyword>Economy</keyword>
+            <keyword>Confidence</keyword>
+        </keywords>
+
+        <longtext>
+
+            <p>
+                New Zealand business confidence improved during the second quarter as consumer spending remained resilient.
+            </p>
+
+            <p>
+                Small and medium-sized enterprises reported stronger sales across the retail and service sectors.
+            </p>
+
+            <p>
+                Economists expect continued growth if inflation remains under control during the second half of the year.
+            </p>
+
+        </longtext>
 
     </document>
 

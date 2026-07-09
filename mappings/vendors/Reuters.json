@@ -1,8 +1,7 @@
 {
     "record_tag": "document",
-
     "article_id": "id",
-    "publication_name": "source",
+    "publication_name": "publication_name",
     "section": "mainsection",
     "published_date": "pubDate",
     "headline": "headline",

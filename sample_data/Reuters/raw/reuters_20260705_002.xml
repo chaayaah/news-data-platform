@@ -4,20 +4,49 @@
 
     <document>
 
-        <id>1003</id>
+        <id>4001</id>
 
-        <source>Reuters</source>
+        <publication_name>Reuters</publication_name>
 
-        <mainsection>Economy</mainsection>
+        <source>www.packreport.de</source>
 
-        <pubDate>2026-07-05 11:00:00</pubDate>
+        <language>de</language>
 
-        <headline>Inflation slows in June</headline>
+        <mainsection>Packaging</mainsection>
 
-        <authors>John Smith</authors>
+        <subcategory>Industry News</subcategory>
+
+        <pubDate>2026-07-05 11:15:00</pubDate>
+
+        <headline>Packaging demand increases across Europe</headline>
+
+        <authors>Stefan Becker</authors>
+
+        <company>PackReport</company>
+
+        <country>Germany</country>
+
+        <keywords>
+            <keyword>Packaging</keyword>
+            <keyword>Manufacturing</keyword>
+            <keyword>Europe</keyword>
+        </keywords>
 
         <longtext>
-            Inflation slowed for the third consecutive month.
+
+            <p>
+                Packaging demand continued to grow during the second quarter.
+            </p>
+
+            <p>
+                Manufacturers reported increased orders from food producers.
+            </p>
+
+            <p>
+                Industry analysts expect demand to remain strong throughout
+                the remainder of the year.
+            </p>
+
         </longtext>
 
     </document>

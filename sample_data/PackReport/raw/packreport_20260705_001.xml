@@ -1,12 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <package build="2026-07-05">
 
     <document>
 
         <id>4001</id>
 
+        <publication_name>PackReport</publication_name>
+
         <source>www.packreport.de</source>
 
+        <language>de</language>
+
         <mainsection>Packaging</mainsection>
+
+        <subcategory>Industry News</subcategory>
 
         <pubDate>2026-07-05 11:15:00</pubDate>
 
@@ -14,14 +22,28 @@
 
         <authors>Stefan Becker</authors>
 
+        <company>PackReport</company>
+
+        <country>Germany</country>
+
+        <keywords>
+            <keyword>Packaging</keyword>
+            <keyword>Manufacturing</keyword>
+            <keyword>Sustainability</keyword>
+        </keywords>
+
         <longtext>
 
             <p>
-                Packaging demand continued to grow during the second quarter.
+                Packaging manufacturers across Europe reported stronger demand during the second quarter, driven by increased orders from the food and beverage industry.
             </p>
 
             <p>
-                Manufacturers reported increased orders from food producers.
+                Several companies announced plans to expand production capacity and invest in more sustainable packaging technologies.
+            </p>
+
+            <p>
+                Industry analysts expect continued growth for the remainder of the year as consumer demand and export activity remain stable.
             </p>
 
         </longtext>

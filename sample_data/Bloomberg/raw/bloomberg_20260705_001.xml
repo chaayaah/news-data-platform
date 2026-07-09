@@ -1,23 +1,53 @@
-<package>
+<?xml version="1.0" encoding="UTF-8"?>
 
-    <entry>
+<package build="2026-07-05">
 
-        <articleId>2001</articleId>
+    <document>
 
-        <provider>Bloomberg</provider>
+        <id>2001</id>
 
-        <category>Markets</category>
+        <publication_name>Bloomberg</publication_name>
 
-        <publishDate>2026-07-05 09:30:00</publishDate>
+        <source>www.bloomberg.com</source>
 
-        <title>Stocks advance after jobs report</title>
+        <language>en</language>
 
-        <byline>Sarah Johnson</byline>
+        <mainsection>Markets</mainsection>
 
-        <content>
-            Global stocks advanced after stronger employment data...
-        </content>
+        <subcategory>Global Markets</subcategory>
 
-    </entry>
+        <pubDate>2026-07-05 09:30:00</pubDate>
+
+        <headline>Stocks advance after stronger U.S. jobs report</headline>
+
+        <authors>Sarah Johnson</authors>
+
+        <company>Bloomberg</company>
+
+        <country>United States</country>
+
+        <keywords>
+            <keyword>Markets</keyword>
+            <keyword>Stocks</keyword>
+            <keyword>Economy</keyword>
+        </keywords>
+
+        <longtext>
+
+            <p>
+                Global equities rose after stronger-than-expected U.S. employment data boosted investor confidence.
+            </p>
+
+            <p>
+                Financial and technology shares led gains across major stock exchanges during morning trading.
+            </p>
+
+            <p>
+                Analysts said investors are closely watching upcoming inflation data for further direction.
+            </p>
+
+        </longtext>
+
+    </document>
 
 </package>
