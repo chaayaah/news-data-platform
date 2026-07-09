@@ -1,5 +1,7 @@
 from pyspark.sql import SparkSession
 from etl.services.mapping_loader import MappingLoader
+from etl.services.xml_parser import XMLParser
+from etl.services.validator import Validator
 
 import json
 import xml.etree.ElementTree as ET
@@ -15,12 +17,6 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # -----------------------------
-# Services
-# -----------------------------
-
-loader = MappingLoader()
-
-# -----------------------------
 # Validation Rules
 # -----------------------------
 
@@ -29,11 +25,19 @@ with open("/app/validation/rules.json") as f:
 
 required_fields = rules["required_fields"]
 
+# -----------------------------
+# Services
+# -----------------------------
+
+loader = MappingLoader()
+parser = XMLParser()
+validator = Validator(required_fields)
+
 valid_records = []
 invalid_records = []
 
 # -----------------------------
-# Process every vendor XML
+# Process XML Files
 # -----------------------------
 
 for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
@@ -41,8 +45,6 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
     print("=" * 60)
     print(f"Processing: {xml_file}")
 
-    # Vendor comes from folder name
-    # sample_data/Reuters/raw/file.xml
     vendor = os.path.basename(
         os.path.dirname(
             os.path.dirname(xml_file)
@@ -69,52 +71,16 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    record_tag = mapping["record_tag"]
-
-    records = root.findall(record_tag)
+    records = parser.parse(
+        root,
+        mapping
+    )
 
     print(f"Records Found: {len(records)}")
 
-    # -----------------------------
-    # Process every document
-    # -----------------------------
-
     for record in records:
 
-        normalized = {}
-
-        for target_field, source_field in mapping.items():
-
-            if target_field == "record_tag":
-                continue
-
-            element = record.find(source_field)
-
-            if element is not None:
-
-                normalized[target_field] = (
-                    element.text.strip()
-                    if element.text
-                    else ""
-                )
-
-            else:
-
-                normalized[target_field] = None
-
-        # -------------------------
-        # Validation
-        # -------------------------
-
-        errors = []
-
-        for field in required_fields:
-
-            if not normalized.get(field):
-
-                errors.append(
-                    f"{field} is missing"
-                )
+        errors = validator.validate(record)
 
         if errors:
 
@@ -129,12 +95,10 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
 
         else:
 
-            valid_records.append(
-                normalized
-            )
+            valid_records.append(record)
 
             print(
-                f"PASSED - {normalized['headline']}"
+                f"PASSED - {record['headline']}"
             )
 
 # -----------------------------
@@ -143,9 +107,7 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
 
 if valid_records:
 
-    df = spark.createDataFrame(
-        valid_records
-    )
+    df = spark.createDataFrame(valid_records)
 
     print("\n=== BRONZE DATA ===")
 
@@ -160,21 +122,13 @@ if valid_records:
 # -----------------------------
 
 print("\n" + "=" * 60)
-
 print("SUMMARY")
-
 print("=" * 60)
 
-print(
-    f"Valid Records: {len(valid_records)}"
-)
-
-print(
-    f"Invalid Records: {len(invalid_records)}"
-)
+print(f"Valid Records: {len(valid_records)}")
+print(f"Invalid Records: {len(invalid_records)}")
 
 for invalid in invalid_records:
-
     print(invalid)
 
 # -----------------------------
