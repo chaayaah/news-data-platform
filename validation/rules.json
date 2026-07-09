@@ -1,7 +1,14 @@
 {
     "required_fields": [
+        "article_id",
         "publication_name",
         "headline",
-        "author"
+        "author",
+        "published_date",
+        "content"
+    ],
+
+    "date_fields": [
+        "published_date"
     ]
 }

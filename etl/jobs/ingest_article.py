@@ -31,7 +31,7 @@ required_fields = rules["required_fields"]
 
 loader = MappingLoader()
 parser = XMLParser()
-validator = Validator(required_fields)
+validator = Validator(rules)
 
 valid_records = []
 invalid_records = []
