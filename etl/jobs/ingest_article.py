@@ -5,6 +5,7 @@ from etl.services.validator import Validator
 from etl.services.preprocessors.pre_generic import PreGeneric
 from etl.services.preprocessors.pre_generic import PreGeneric
 from etl.services.preprocessors.vendor.factory import VendorPreprocessorFactory
+from etl.services.preprocessors.post_generic import PostGeneric
 
 import json
 import xml.etree.ElementTree as ET
@@ -36,6 +37,7 @@ loader = MappingLoader()
 parser = XMLParser()
 validator = Validator(rules)
 pre_generic = PreGeneric()
+post_generic = PostGeneric()
 
 valid_records = []
 invalid_records = []
@@ -92,6 +94,8 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
     print(f"Records Found: {len(records)}")
 
     for record in records:
+
+        record = post_generic.process(record)
 
         errors = validator.validate(record)
 
