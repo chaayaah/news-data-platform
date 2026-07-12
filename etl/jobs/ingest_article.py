@@ -2,6 +2,9 @@ from pyspark.sql import SparkSession
 from etl.services.mapping_loader import MappingLoader
 from etl.services.xml_parser import XMLParser
 from etl.services.validator import Validator
+from etl.services.preprocessors.pre_generic import PreGeneric
+from etl.services.preprocessors.pre_generic import PreGeneric
+from etl.services.preprocessors.vendor.factory import VendorPreprocessorFactory
 
 import json
 import xml.etree.ElementTree as ET
@@ -32,6 +35,7 @@ required_fields = rules["required_fields"]
 loader = MappingLoader()
 parser = XMLParser()
 validator = Validator(rules)
+pre_generic = PreGeneric()
 
 valid_records = []
 invalid_records = []
@@ -70,6 +74,15 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
 
     tree = ET.parse(xml_file)
     root = tree.getroot()
+
+    root = pre_generic.process(root)
+
+    vendor_preprocessor = (
+    VendorPreprocessorFactory
+    .get_preprocessor(vendor)
+    )
+
+    root = vendor_preprocessor.process(root)
 
     records = parser.parse(
         root,
