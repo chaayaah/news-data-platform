@@ -1,16 +1,16 @@
 class PostGeneric:
 
-    def process(self, record):
+    def process(self, records):
 
         print("Running Post Generic...")
 
-        self.normalize_author(record)
+        for record in records:
 
-        self.normalize_publication(record)
+            self.normalize_author(record)
+            self.normalize_publication(record)
+            self.trim_values(record)
 
-        self.trim_values(record)
-
-        return record
+        return records
 
     # -----------------------------
     # Normalize Author
@@ -21,7 +21,6 @@ class PostGeneric:
         author = record.get("author")
 
         if author:
-
             record["author"] = author.title()
 
     # -----------------------------
@@ -30,26 +29,20 @@ class PostGeneric:
 
     def normalize_publication(self, record):
 
-        publication = record.get(
-            "publication_name"
-        )
+        publication = record.get("publication_name")
 
         if publication:
 
             mapping = {
-
                 "businessdesk": "BusinessDesk",
                 "reuters": "Reuters",
                 "bloomberg": "Bloomberg",
                 "packreport": "PackReport"
-
             }
 
-            record["publication_name"] = (
-                mapping.get(
-                    publication.lower(),
-                    publication
-                )
+            record["publication_name"] = mapping.get(
+                publication.lower(),
+                publication
             )
 
     # -----------------------------
@@ -61,5 +54,4 @@ class PostGeneric:
         for key, value in record.items():
 
             if isinstance(value, str):
-
                 record[key] = value.strip()

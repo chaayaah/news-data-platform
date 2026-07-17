@@ -1,10 +1,15 @@
-from .stage import PipelineStage
-
 from etl.services.preprocessors.pre_generic import PreGeneric
 from etl.services.preprocessors.post_generic import PostGeneric
+
 from etl.services.preprocessors.vendor.factory import VendorPreprocessorFactory
+
 from etl.services.xml_parser import XMLParser
 from etl.services.validator import Validator
+
+from etl.services.pipeline.stage import PipelineStage
+from etl.services.logger import Logger
+
+logger = Logger.get_logger()
 
 
 class PreGenericStage(PipelineStage):
@@ -13,8 +18,6 @@ class PreGenericStage(PipelineStage):
         self.processor = PreGeneric()
 
     def run(self, context):
-
-        print("Running Pre Generic...")
 
         context.root = self.processor.process(context.root)
 
@@ -25,11 +28,13 @@ class VendorPreprocessorStage(PipelineStage):
 
     def run(self, context):
 
-        processor = VendorPreprocessorFactory.get_preprocessor(
+        preprocessor = VendorPreprocessorFactory.get_preprocessor(
             context.vendor
         )
 
-        context.root = processor.process(context.root)
+        context.root = preprocessor.process(
+            context.root
+        )
 
         return context
 
@@ -56,14 +61,9 @@ class PostGenericStage(PipelineStage):
 
     def run(self, context):
 
-        processed = []
-
-        for record in context.records:
-            processed.append(
-                self.processor.process(record)
-            )
-
-        context.records = processed
+        context.records = self.processor.process(
+            context.records
+        )
 
         return context
 
@@ -71,26 +71,19 @@ class PostGenericStage(PipelineStage):
 class ValidatorStage(PipelineStage):
 
     def __init__(self, rules):
+
         self.validator = Validator(rules)
 
     def run(self, context):
 
-        context.valid_records = []
-        context.invalid_records = []
+        context.valid_records, context.invalid_records = (
+            self.validator.validate(context.records)
+        )
 
-        for record in context.records:
-
-            errors = self.validator.validate(record)
-
-            if errors:
-
-                context.invalid_records.append({
-                    "record": record,
-                    "errors": errors
-                })
-
-            else:
-
-                context.valid_records.append(record)
+        # Pipeline metrics
+        context.metrics["files_processed"] = 1
+        context.metrics["records_processed"] = len(context.records)
+        context.metrics["valid_records"] = len(context.valid_records)
+        context.metrics["invalid_records"] = len(context.invalid_records)
 
         return context

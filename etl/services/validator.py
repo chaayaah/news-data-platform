@@ -97,9 +97,6 @@ class Validator:
             article_id
         )
 
-        # Debug (remove later)
-        print(f"Checking duplicate key: {key}")
-
         if key in self.seen_article_ids:
 
             errors.append(
@@ -118,21 +115,36 @@ class Validator:
 
     def validate(
         self,
-        record
+        records
     ):
 
-        errors = []
+        valid_records = []
+        invalid_records = []
 
-        errors.extend(
-            self.validate_required_fields(record)
-        )
+        for record in records:
 
-        errors.extend(
-            self.validate_date_fields(record)
-        )
+            errors = []
 
-        errors.extend(
-            self.validate_duplicate_article(record)
-        )
+            errors.extend(
+                self.validate_required_fields(record)
+            )
 
-        return errors
+            errors.extend(
+                self.validate_date_fields(record)
+            )
+
+            errors.extend(
+                self.validate_duplicate_article(record)
+            )
+
+            if errors:
+
+                record["validation_errors"] = errors
+
+                invalid_records.append(record)
+
+            else:
+
+                valid_records.append(record)
+
+        return valid_records, invalid_records
