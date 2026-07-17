@@ -1,11 +1,8 @@
 from pyspark.sql import SparkSession
+
 from etl.services.mapping_loader import MappingLoader
-from etl.services.xml_parser import XMLParser
-from etl.services.validator import Validator
-from etl.services.preprocessors.pre_generic import PreGeneric
-from etl.services.preprocessors.pre_generic import PreGeneric
-from etl.services.preprocessors.vendor.factory import VendorPreprocessorFactory
-from etl.services.preprocessors.post_generic import PostGeneric
+from etl.services.pipeline.context import PipelineContext
+from etl.services.pipeline.factory import PipelineFactory
 
 import json
 import xml.etree.ElementTree as ET
@@ -16,9 +13,11 @@ import os
 # Spark
 # -----------------------------
 
-spark = SparkSession.builder \
-    .appName("NewsDataPlatform") \
+spark = (
+    SparkSession.builder
+    .appName("NewsDataPlatform")
     .getOrCreate()
+)
 
 # -----------------------------
 # Validation Rules
@@ -27,17 +26,23 @@ spark = SparkSession.builder \
 with open("/app/validation/rules.json") as f:
     rules = json.load(f)
 
-required_fields = rules["required_fields"]
+# -----------------------------
+# Pipeline Configuration
+# -----------------------------
+
+with open("/app/config/pipeline.json") as f:
+    pipeline_config = json.load(f)
 
 # -----------------------------
 # Services
 # -----------------------------
 
 loader = MappingLoader()
-parser = XMLParser()
-validator = Validator(rules)
-pre_generic = PreGeneric()
-post_generic = PostGeneric()
+
+pipeline = PipelineFactory.build_pipeline(
+    pipeline_config["stages"],
+    rules
+)
 
 valid_records = []
 invalid_records = []
@@ -77,46 +82,40 @@ for xml_file in glob.glob("/app/sample_data/*/raw/*.xml"):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
-    root = pre_generic.process(root)
+    # -----------------------------
+    # Create Pipeline Context
+    # -----------------------------
 
-    vendor_preprocessor = (
-    VendorPreprocessorFactory
-    .get_preprocessor(vendor)
-    )
+    context = PipelineContext()
 
-    root = vendor_preprocessor.process(root)
+    context.vendor = vendor
+    context.mapping = mapping
+    context.root = root
 
-    records = parser.parse(
-        root,
-        mapping
-    )
+    # -----------------------------
+    # Run Pipeline
+    # -----------------------------
 
-    print(f"Records Found: {len(records)}")
+    context = pipeline.run(context)
 
-    for record in records:
+    print(f"Records Found: {len(context.records)}")
 
-        record = post_generic.process(record)
+    valid_records.extend(context.valid_records)
 
-        errors = validator.validate(record)
+    for invalid in context.invalid_records:
 
-        if errors:
+        invalid_records.append({
+            "file": os.path.basename(xml_file),
+            "errors": ", ".join(invalid["errors"])
+        })
 
-            invalid_records.append({
-                "file": os.path.basename(xml_file),
-                "errors": ", ".join(errors)
-            })
+    for record in context.valid_records:
 
-            print(
-                f"FAILED: {errors}"
-            )
+        print(f"PASSED - {record['headline']}")
 
-        else:
+    for invalid in context.invalid_records:
 
-            valid_records.append(record)
-
-            print(
-                f"PASSED - {record['headline']}"
-            )
+        print(f"FAILED - {', '.join(invalid['errors'])}")
 
 # -----------------------------
 # Write Bronze
