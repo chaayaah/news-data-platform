@@ -1,0 +1,9 @@
+{
+    "stages": [
+        "pre_generic",
+        "vendor_preprocessor",
+        "parser",
+        "post_generic",
+        "validator"
+    ]
+}

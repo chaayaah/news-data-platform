@@ -1,0 +1,14 @@
+{
+    "application": {
+        "name": "News ETL",
+        "environment": "development"
+    },
+
+    "spark": {
+        "app_name": "News ETL Pipeline"
+    },
+
+    "bronze": {
+        "output_format": "memory"
+    }
+}

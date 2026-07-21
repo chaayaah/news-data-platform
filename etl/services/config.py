@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 
 
@@ -6,19 +7,29 @@ class Config:
 
     _cache = {}
 
-    CONFIG_DIR = Path("/app/config")
+    @classmethod
+    def get_environment(cls):
+        return os.getenv("APP_ENV", "development")
 
     @classmethod
     def load(cls, filename):
 
-        if filename in cls._cache:
-            return cls._cache[filename]
+        environment = cls.get_environment()
 
-        filepath = cls.CONFIG_DIR / filename
+        cache_key = (environment, filename)
 
-        with open(filepath, "r") as f:
+        if cache_key in cls._cache:
+            return cls._cache[cache_key]
+
+        config_path = (
+            Path("/app/config")
+            / environment
+            / filename
+        )
+
+        with open(config_path, "r") as f:
             config = json.load(f)
 
-        cls._cache[filename] = config
+        cls._cache[cache_key] = config
 
         return config

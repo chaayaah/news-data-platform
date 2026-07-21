@@ -3,6 +3,7 @@ from pyspark.sql import SparkSession
 from etl.services.mapping_loader import MappingLoader
 from etl.services.pipeline.context import PipelineContext
 from etl.services.pipeline.factory import PipelineFactory
+from etl.services.config import Config
 
 import json
 import xml.etree.ElementTree as ET
@@ -10,12 +11,18 @@ import glob
 import os
 
 # -----------------------------
+# Application Configuration
+# -----------------------------
+
+app_config = Config.load("app.json")
+
+# -----------------------------
 # Spark
 # -----------------------------
 
 spark = (
     SparkSession.builder
-    .appName("NewsDataPlatform")
+    .appName(app_config["spark"]["app_name"])
     .getOrCreate()
 )
 
@@ -23,15 +30,13 @@ spark = (
 # Validation Rules
 # -----------------------------
 
-with open("/app/validation/rules.json") as f:
-    rules = json.load(f)
+rules = Config.load("validation.json")
 
 # -----------------------------
 # Pipeline Configuration
 # -----------------------------
 
-with open("/app/config/pipeline.json") as f:
-    pipeline_config = json.load(f)
+pipeline_config = Config.load("pipeline.json")
 
 # -----------------------------
 # Services
