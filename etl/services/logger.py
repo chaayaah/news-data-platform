@@ -1,6 +1,8 @@
 import logging
 import os
 
+from etl.services.config import Config
+
 
 class Logger:
 
@@ -12,28 +14,34 @@ class Logger:
         if cls._logger:
             return cls._logger
 
+        config = Config.load("logging.json")
+        logging_config = config["logging"]
+
         os.makedirs("/app/logs", exist_ok=True)
 
         logger = logging.getLogger("NewsPipeline")
 
-        logger.setLevel(logging.INFO)
+        logger.setLevel(
+            getattr(logging, logging_config["level"].upper())
+        )
 
         formatter = logging.Formatter(
-            "%(asctime)s %(levelname)-8s %(message)s"
+            logging_config["format"]
         )
 
         file_handler = logging.FileHandler(
-            "/app/logs/pipeline.log"
+            logging_config["file"]
         )
 
         file_handler.setFormatter(formatter)
 
         console_handler = logging.StreamHandler()
-
         console_handler.setFormatter(formatter)
 
-        logger.addHandler(file_handler)
-        logger.addHandler(console_handler)
+        # Prevent duplicate handlers if logger is recreated
+        if not logger.handlers:
+            logger.addHandler(file_handler)
+            logger.addHandler(console_handler)
 
         cls._logger = logger
 
