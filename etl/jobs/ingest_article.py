@@ -3,7 +3,15 @@ from pyspark.sql import SparkSession
 from etl.services.mapping_loader import MappingLoader
 from etl.services.pipeline.context import PipelineContext
 from etl.services.pipeline.factory import PipelineFactory
+from etl.services.pipeline.stages import (
+    PreGenericStage,
+    VendorPreprocessorStage,
+    ParserStage,
+    PostGenericStage,
+    ValidatorStage,
+)
 from etl.services.config import Config
+from etl.services.validator import Validator
 
 import json
 import xml.etree.ElementTree as ET
@@ -31,6 +39,7 @@ spark = (
 # -----------------------------
 
 rules = Config.load("validation.json")
+validator = Validator(rules)
 
 # -----------------------------
 # Pipeline Configuration
@@ -44,9 +53,21 @@ pipeline_config = Config.load("pipeline.json")
 
 loader = MappingLoader()
 
+# -----------------------------
+# Pipeline Stages
+# -----------------------------
+
+stages = {
+    "pre_generic": PreGenericStage(),
+    "vendor_preprocessor": VendorPreprocessorStage(),
+    "parser": ParserStage(),
+    "post_generic": PostGenericStage(),
+    "validator": ValidatorStage(validator),
+}
+
 pipeline = PipelineFactory.build_pipeline(
     pipeline_config["stages"],
-    rules
+    stages
 )
 
 valid_records = []

@@ -70,9 +70,9 @@ class PostGenericStage(PipelineStage):
 
 class ValidatorStage(PipelineStage):
 
-    def __init__(self, rules):
+    def __init__(self, validator):
 
-        self.validator = Validator(rules)
+        self.validator = validator
 
     def run(self, context):
 
